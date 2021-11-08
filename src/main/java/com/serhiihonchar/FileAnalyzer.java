@@ -1,45 +1,55 @@
 package com.serhiihonchar;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class FileAnalyzer {
-    public static void main(String[] args) throws Exception {
-//        File file = null;
-//        if (0 < args.length) {
-//            String filename = args[0];
-//            file = new File(filename);
-//        }
+
+    public static void readingFromFile() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the path to the file where the word must be found: ");
         String filename = scanner.nextLine();
         File file = new File(filename);
+        Charset charset = StandardCharsets.UTF_8;
+        String content;
         int count = 0;
-        String s;
-        String[] buffer;
 
-        FileReader fileReader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the word to be found: ");
-        String word = sc.nextLine();
+        try (InputStream inputStream = new FileInputStream(file)) {
 
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Enter the word to be found: ");
+            String word = sc.nextLine();
 
-        while ((s = bufferedReader.readLine()) != null) {
-            buffer = s.split(" ");
-            for (String chr : buffer) {
-                if (chr.equals(word)) {
-                    count++;
+            byte[] bytes = new byte[(int) file.length()];
+
+            int offset = 0;
+            while (offset < bytes.length) {
+                int result = inputStream.read(bytes, offset, bytes.length - offset);
+                content = new String(bytes, charset);
+                String[] s = content.split(" ");
+
+                //  str = str.replaceAll("(\\r|\\n)", "");
+                for (String wordExample : s) {
+                    if (wordExample.equals(word)) {
+                        count++;
+                    }
+                    offset += result;
                 }
             }
+            if (count == 0) {
+                System.out.println("Word not found!");
+            } else {
+                System.out.println("Word: " + word + " was found! Count : " + count);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        if (count == 0) {
-            System.out.println("Word not found!");
-        } else {
-            System.out.println("Word: " + word + " found! Count : " + count);
-        }
-        fileReader.close();
+    }
+
+    public static void main(String[] args) {
+        readingFromFile();
     }
 }
