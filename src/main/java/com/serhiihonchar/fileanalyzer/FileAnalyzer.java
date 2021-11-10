@@ -11,11 +11,10 @@ public class FileAnalyzer {
     public static void main(String[] args) {
         file = new File(args[0]);
         word = args[1];
-        readingFromFile();
+        readingFromFile(file, word);
     }
 
-    public static void readingFromFile() {
-
+    public static int readingFromFile(File file, String word) {
         Charset charset = StandardCharsets.UTF_8;
         String content;
         int count = 0;
@@ -39,12 +38,13 @@ public class FileAnalyzer {
                 }
             }
             if (count == 0) {
-                System.out.println("Word not found!");
+                throw new IOException("Word not found!");
             } else {
                 System.out.println("Word: " + word + " was found! Count : " + count);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return count;
     }
 }
